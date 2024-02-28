@@ -1,0 +1,19 @@
+{
+  "users": [
+    {
+      "nome": "Jorge Herrera",
+      "idade": 35,
+      "email": "jorge@senai.br"
+    },
+    {
+      "nome": "Bruno Costa",
+      "idade": 24,
+      "email": "bruno@senai.br"
+    },
+    {
+      "nome": "Rayane Cristina",
+      "idade": 22,
+      "email": "rayane@senai.br"
+    }
+  ]
+}

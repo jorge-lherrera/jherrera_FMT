@@ -1,5 +1,9 @@
 {
+  "scripts": {
+    "server": "json-server --watch data.json --port 9000"
+  },
   "dependencies": {
+    "json-server": "^1.0.0-alpha.23",
     "prompt-sync": "^4.2.0"
   }
 }
