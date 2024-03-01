@@ -1,4 +1,4 @@
-const getImages = async function () {
+const getImages = (async function () {
   try {
     const res = await fetch(
       `https://api.thecatapi.com/v1/images/search?limit=10`
@@ -13,6 +13,4 @@ const getImages = async function () {
   } catch {
     console.error(`Error loading data`);
   }
-};
-
-getImages();
+})();
