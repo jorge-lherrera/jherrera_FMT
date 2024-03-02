@@ -1,3 +1,5 @@
+// Ex2 - Ex3
+
 const BASE_URL = `http://localhost:9000/users`;
 
 const getUserInfo = async function () {
