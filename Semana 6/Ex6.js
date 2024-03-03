@@ -1,8 +1,5 @@
 // // Ex6-7-8
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Función para verificar el número de CEP
 const checkNumber = async function () {
   let cep;
   while (true) {
@@ -23,7 +20,6 @@ const checkNumber = async function () {
   return cep;
 };
 
-// Función para verificar el CEP y mostrar los datos
 const checkCep = async function () {
   try {
     const cep = await checkNumber();
@@ -32,74 +28,77 @@ const checkCep = async function () {
 
     if (!("erro" in data) && data) {
       const confirmed = confirm(`
-       Logradouro - ${data.logradouro ? data.logradouro : `N/A`}
-       Complemento - ${data.complemento ? data.complemento : `N/A`}
-       Bairro - ${data.bairro ? data.bairro : `N/A`}
-       Localidade/Uf - ${data.localidade ? data.localidade : `N/A`} -- ${
+        Logradouro - ${data.logradouro ? data.logradouro : `N/A`}
+        Complemento - ${data.complemento ? data.complemento : `N/A`}
+        Bairro - ${data.bairro ? data.bairro : `N/A`}
+        Localidade/Uf - ${data.localidade ? data.localidade : `N/A`} -- ${
         data.uf ? data.uf : `N/A`
       }
-        
-¿Estos datos son correctos?`);
+
+      Esses dados estão corretos?`);
 
       if (confirmed) {
-        const saveConfirmed = confirm("¿Desea guardar estos datos?");
+        const saveConfirmed = confirm("Quer salvar esses dados?");
         if (saveConfirmed) {
-          const key = prompt(
-            "Inserte el nombre de la llave donde se va a guardar"
-          );
-          if (key !== null && key.trim() !== "") {
-            const existingData = localStorage.getItem(key);
-            if (existingData !== null) {
-              const replaceExisting = confirm(
-                "La llave ya existe. ¿Desea reemplazarla?"
-              );
-              if (!replaceExisting) {
-                return await checkCep();
-              }
-            }
-            localStorage.setItem(key, JSON.stringify(data));
-            alert("Datos guardados exitosamente");
-            return data;
-          } else {
-            alert("Nombre de llave inválido. Por favor, inténtelo de nuevo.");
-            return await checkCep();
-          }
+          saveData(data);
         } else {
-          alert("Datos no guardados. Aplicación cerrada.");
-          return null;
+          alert("Dados não salvos. Aplicativo encerrado.");
         }
       } else {
-        const retry = confirm("¿Desea hacer una nueva consulta?");
+        const retry = confirm("Quer fazer uma nova consulta?");
         if (retry) {
           return await checkCep();
         } else {
-          alert("Aplicación cerrada.");
-          return null;
+          alert("Aplicativo encerrado.");
         }
       }
     } else {
-      throw new Error(`El CEP ingresado no es válido`);
+      throw new Error(`O CEP informado não é válido`);
     }
   } catch (error) {
     if (error.message !== "Operação cancelada") {
-      alert(error.message);
+      if (error.message === "A chave não existe") {
+        alert("A chave não existe. Tente novamente");
+      } else {
+        alert(error.message);
+      }
       await checkCep();
     }
   }
 };
 
-// Función para iniciar el proceso de guardar datos
-const saveData = async function () {
+const checkKey = async function (key) {
+  const existingData = localStorage.getItem(key);
+
+  if (existingData !== null) {
+    const replaceExisting = confirm("A chave já existe. Quer substituir?");
+    return replaceExisting;
+  }
+
+  return true;
+};
+
+const saveData = async function (data) {
   try {
-    const data = await checkCep();
-    if (data !== null) {
-      // Aquí podrías hacer algo más con los datos si es necesario
+    const key = prompt("Digite o nome da chave onde os dados serão salvos");
+
+    if (key !== null && key.trim() !== "") {
+      const shouldSave = await checkKey(key);
+
+      if (shouldSave) {
+        localStorage.setItem(key, JSON.stringify(data));
+        alert("Dados salvos com sucesso");
+      } else {
+        saveData(data);
+      }
+    } else {
+      alert("Nome de chave inválido. Por favor, tente novamente.");
+      saveData(data);
     }
   } catch (error) {
     console.log(error);
-    await saveData();
+    alert("Erro ao salvar dados");
   }
 };
 
-// Iniciar el proceso
-saveData();
+checkCep();
