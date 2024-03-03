@@ -1,8 +1,8 @@
 // // Ex6-7-8
 
-// localStorage.clear();
+////////////////////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////
+// Función para verificar el número de CEP
 const checkNumber = async function () {
   let cep;
   while (true) {
@@ -23,6 +23,7 @@ const checkNumber = async function () {
   return cep;
 };
 
+// Función para verificar el CEP y mostrar los datos
 const checkCep = async function () {
   try {
     const cep = await checkNumber();
@@ -30,16 +31,54 @@ const checkCep = async function () {
     const data = await res.json();
 
     if (!("erro" in data) && data) {
-      alert(`
+      const confirmed = confirm(`
        Logradouro - ${data.logradouro ? data.logradouro : `N/A`}
        Complemento - ${data.complemento ? data.complemento : `N/A`}
        Bairro - ${data.bairro ? data.bairro : `N/A`}
        Localidade/Uf - ${data.localidade ? data.localidade : `N/A`} -- ${
         data.uf ? data.uf : `N/A`
-      }`);
-      return data;
+      }
+        
+¿Estos datos son correctos?`);
+
+      if (confirmed) {
+        const saveConfirmed = confirm("¿Desea guardar estos datos?");
+        if (saveConfirmed) {
+          const key = prompt(
+            "Inserte el nombre de la llave donde se va a guardar"
+          );
+          if (key !== null && key.trim() !== "") {
+            const existingData = localStorage.getItem(key);
+            if (existingData !== null) {
+              const replaceExisting = confirm(
+                "La llave ya existe. ¿Desea reemplazarla?"
+              );
+              if (!replaceExisting) {
+                return await checkCep();
+              }
+            }
+            localStorage.setItem(key, JSON.stringify(data));
+            alert("Datos guardados exitosamente");
+            return data;
+          } else {
+            alert("Nombre de llave inválido. Por favor, inténtelo de nuevo.");
+            return await checkCep();
+          }
+        } else {
+          alert("Datos no guardados. Aplicación cerrada.");
+          return null;
+        }
+      } else {
+        const retry = confirm("¿Desea hacer una nueva consulta?");
+        if (retry) {
+          return await checkCep();
+        } else {
+          alert("Aplicación cerrada.");
+          return null;
+        }
+      }
     } else {
-      throw new Error(`O CEP inserido não está correto`);
+      throw new Error(`El CEP ingresado no es válido`);
     }
   } catch (error) {
     if (error.message !== "Operação cancelada") {
@@ -49,48 +88,18 @@ const checkCep = async function () {
   }
 };
 
-checkCep();
+// Función para iniciar el proceso de guardar datos
+const saveData = async function () {
+  try {
+    const data = await checkCep();
+    if (data !== null) {
+      // Aquí podrías hacer algo más con los datos si es necesario
+    }
+  } catch (error) {
+    console.log(error);
+    await saveData();
+  }
+};
 
-// const saveData = async function () {
-//   try {
-//     const data = await checkCep();
-//     console.log(data);
-//     if (data) {
-//       const checkData = prompt(`Os dados estão corretos SIM/NÃO`);
-
-//       if (checkData.toLowerCase() === "sim") {
-//         alert(`datos correctos`);
-//       } else {
-//         prompt(
-//           `Desculpe o transtorno, você gostaria de fazer uma nova consulta`
-//         );
-//       }
-//     } else {
-//       throw new Error(`datos incorrectos`);
-//     }
-//   } catch (error) {
-//     console.log(error);
-//     await saveData();
-//   }
-// };
-
-// saveData();
-
-// const saveDataLocal = prompt(
-//   `Deseja salvar as informações em localstore SIM/NÃO`
-// );
-
-//   prompt(`insira o nome da chave para salvar os dados`);
-//   const checkLocalStore = localStorage.key(checkKey);
-// };
-// prompt(`A chave inserida está em uso, deseja substituir`);
-
-// //       if (saveDataLocal.toLowerCase() === "sim") {
-// //         const checkKey = prompt(`Insira um nome chave para salvar os dados`);
-// //         console.log(checkKey);
-// //         console.log(checkLocalStore);
-// //         checkLocalStore.toLowerCase() === `endereco`
-// //           : "";
-// //       }
-// //       const dataLocalStore = JSON.stringify(data);
-// //       localStorage.setItem("endereco",
+// Iniciar el proceso
+saveData();
